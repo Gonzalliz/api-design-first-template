@@ -1,0 +1,8 @@
+com/demo/bootstrap/OpenAPI2SpringBoot.java
+com/demo/bootstrap/RFC3339DateFormat.java
+com/demo/bootstrap/controller/ApiUtil.java
+com/demo/bootstrap/controller/CustomersApi.java
+com/demo/bootstrap/controller/CustomersApiController.java
+com/demo/bootstrap/dto/BaseCustomerDTO.java
+com/demo/bootstrap/dto/CustomerDTO.java
+com/demo/bootstrap/dto/ListResponseCustomerDTO.java

@@ -1,0 +1,296 @@
+openapi: 3.0.1
+info:
+  title: Java API Design First Template
+  description: Java based micro-service server template for API first development using openapi-generator
+  termsOfService: Terms of service <TBA>
+  contact:
+    name: Chuck Norris
+    url:  https://chucknorris.com
+    email: https://chucknorris.com/
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: v1
+  x-audience:
+    - company-internal
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /customers:
+    get:
+      tags:
+        - customer
+      summary: Returns the driver record identified by the parameters
+      description: Returns the customer records identified by the parameters
+      operationId: findCustomers
+      parameters:
+        - name: opco_number
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: Page number to fetch
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: Number of records per page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "404":
+          description: Customers not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ListResponseCustomerDTO'
+        "200":
+          description: Customers found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ListResponseCustomerDTO'
+        "400":
+          description: Customers validation failed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ListResponseCustomerDTO'
+        "403":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ListResponseCustomerDTO'
+        "401":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ListResponseCustomerDTO'
+    post:
+      tags:
+        - customer
+      summary: Creates a new driver record or update an existing driver record
+      description: Returns the newly created Driver Master Data with its auto assigned
+        Id
+      operationId: createCustomer
+      parameters:
+        - name: opco_number
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDTO'
+        required: true
+      responses:
+        "403":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "409":
+          description: Customer already exists.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "401":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "400":
+          description: Customer validation failed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "201":
+          description: Customer created.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "404":
+          description: Customer not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+  /customers/{customer_number}:
+    get:
+      tags:
+        - customer
+      summary: Returns the customer record identified by the parameters
+      description: Returns the customer record identified by the parameters
+      operationId: findCustomer
+      parameters:
+        - name: opco_number
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: customer_number
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "403":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "401":
+          description: Not authorized.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "400":
+          description: Customer validation failed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+        "404":
+          description: Customer not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CustomerDTO'
+    patch:
+      tags:
+        - customer
+      summary: Update an existing customer record
+      description: Only return the 204 status on success
+      operationId: updateCustomer
+      parameters:
+        - name: opco_number
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: customer_number
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseCustomerDTO'
+        required: true
+      responses:
+        "403":
+          description: Not authorized.
+        "204":
+          description: Customer updated.
+        "409":
+          description: Customer locked.
+        "401":
+          description: Not authorized.
+        "400":
+          description: Customer validation failed.
+        "404":
+          description: Customer not found.
+components:
+  schemas:
+    CustomerDTO:
+      required:
+        - customerName
+        - customerNumber
+        - opCoNumber
+      type: object
+      properties:
+        stopClass:
+          type: string
+          example: REGULAR
+          enum:
+            - REGULAR
+            - PREMIUM
+            - PALLET_REGULAR
+            - BACKHAUL
+            - PALLET_PREMIUM
+            - PREMIUM_PLUS
+        stopAttributes:
+          type: array
+          example:
+            - STAIRS
+            - LONG_WALK
+          items:
+            type: string
+            example: "[\"STAIRS\",\"LONG_WALK\"]"
+            enum:
+              - STAIRS
+              - ELEVATOR
+              - LONG_WALK
+              - SPECIAL_EVENT
+        opCoNumber:
+          type: string
+          example: US0075
+        customerNumber:
+          type: string
+          example: "11111111"
+        customerName:
+          type: string
+          example: John Smith
+    ListResponseCustomerDTO:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerDTO'
+    BaseCustomerDTO:
+      type: object
+      properties:
+        stopClass:
+          type: string
+          example: REGULAR
+          enum:
+            - REGULAR
+            - PREMIUM
+            - PALLET_REGULAR
+            - BACKHAUL
+            - PALLET_PREMIUM
+            - PREMIUM_PLUS
+        stopAttributes:
+          type: array
+          example:
+            - STAIRS
+            - LONG_WALK
+          items:
+            type: string
+            example: "[\"STAIRS\",\"LONG_WALK\"]"
+            enum:
+              - STAIRS
+              - ELEVATOR
+              - LONG_WALK
+              - SPECIAL_EVENT
